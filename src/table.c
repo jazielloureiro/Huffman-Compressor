@@ -20,7 +20,7 @@ void transfer_chars_to_table(unsigned *freq, char_table *table){
 	for(unsigned i = 0; i < MAX_ASCII; i++){
 		if(freq[i] > 0){
 			tree_node *leaf = create_leaf(i, freq[i]);
-			add_new_node_to_list(table, leaf);
+			add_new_node_to_list(&table->list, leaf);
 		}
 	}
 }
