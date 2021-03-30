@@ -41,6 +41,7 @@ char *read_whole_file(char *filename){
 	char *buffer = malloc(length);
 
 	fread(buffer, 1, length, file);
+	fclose(file);
 
 	return buffer;
 }
