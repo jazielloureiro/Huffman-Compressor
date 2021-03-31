@@ -2,22 +2,12 @@
 
 #include "file.h"
 #include "list.h"
-#include "table.h"
-
-void print(tree_node *node){
-	if(node != NULL){
-		printf("%s : %d;\n", node->chars, node->frequency);
-		print(node->left);
-		print(node->right);
-	}
-}
+#include "tree.h"
 
 int main(){
 	char *buffer = read_whole_file("data/input1.txt");
-	char_table table = create_table(buffer);
-	tree_node *root = create_huffman_tree(table.list);
-
-	print(root);
+	list_node *list = create_char_list(buffer);
+	tree_node *root = create_huffman_tree(list);
 
 	return 0;
 }

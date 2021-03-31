@@ -1,20 +1,17 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
 
 #include "list.h"
-#include "table.h"
+#include "tree.h"
 
-tree_node *create_leaf(char character, unsigned frequency){
-	tree_node *leaf = malloc(sizeof(tree_node));
+void init_freq_array(unsigned *freq){
+	for(unsigned i = 0; i < MAX_ASCII; i++)
+		freq[i] = 0;
+}
 
-	leaf->chars = malloc(2);
-	sprintf(leaf->chars, "%c", character);
-	leaf->frequency = frequency;
-	leaf->left = NULL;
-	leaf->right = NULL;
-
-	return leaf;
+void calc_chars_frequency_in_the_buffer(unsigned *freq, char *buffer){
+	while(*buffer != '\0')
+		freq[*(buffer++)]++;
 }
 
 void add_new_node_to_list(list_node **list, tree_node *tree){
@@ -40,31 +37,24 @@ void add_new_node_to_list(list_node **list, tree_node *tree){
 	}
 }
 
-tree_node *create_internal_tree_node(tree_node *left, tree_node *right){
-	tree_node *internal = malloc(sizeof(tree_node));
-
-	internal->chars = malloc(strlen(left->chars) + strlen(right->chars) + 1);
-	sprintf(internal->chars, "%s%s", right->chars, left->chars);
-
-	internal->frequency = left->frequency + right->frequency;
-
-	internal->left = left;
-	internal->right = right;
-
-	return internal;
+void transfer_chars_to_list(unsigned *freq, list_node **list){
+	for(unsigned i = 0; i < MAX_ASCII; i++){
+		if(freq[i] > 0){
+			tree_node *leaf = create_leaf(i, freq[i]);
+			add_new_node_to_list(list, leaf);
+		}
+	}
 }
 
-tree_node *create_huffman_tree(list_node *list){
-	while(list->next != NULL){
-		tree_node *new = create_internal_tree_node(list->tree, list->next->tree);
-		list_node *trash = list;
+list_node *create_char_list(char *buffer){
+	unsigned freq[MAX_ASCII];
+	list_node *list = NULL;
 
-		list = list->next->next;
-		free(trash->next);
-		free(trash);
-		
-		add_new_node_to_list(&list, new);
-	}
+	init_freq_array(freq);
 
-	return list->tree;
+	calc_chars_frequency_in_the_buffer(freq, buffer);
+
+	transfer_chars_to_list(freq, &list);
+
+	return list;
 }

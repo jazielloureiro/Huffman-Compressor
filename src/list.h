@@ -1,6 +1,9 @@
 #ifndef LIST_H
 #define LIST_H
 
+#define MAX_ASCII 128
+#define LEAF_CHARS_LENGTH 2
+
 typedef struct Tree_Node{
 	char *chars;
 	unsigned frequency;
@@ -12,13 +15,10 @@ typedef struct List_Node{
 	struct List_Node *next;
 } list_node;
 
-typedef struct{
-	list_node *list;
-} char_table;
-
-tree_node *create_leaf(char character, unsigned frequency);
+void init_freq_array(unsigned *freq);
+void calc_chars_frequency_in_the_buffer(unsigned *freq, char *buffer);
 void add_new_node_to_list(list_node **list, tree_node *leaf);
-tree_node *create_internal_tree_node(tree_node *left, tree_node *right);
-tree_node *create_huffman_tree(list_node *list);
+void transfer_chars_to_list(unsigned *freq, list_node **list);
+list_node *create_char_list(char *buffer);
 
 #endif
