@@ -8,7 +8,7 @@ MAKE = mkdir -p
 RM = rm -rf
 
 # Binary
-BIN = huffman
+BIN = hc
 
 # Directories
 SOURCE_DIR = src
