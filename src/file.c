@@ -89,7 +89,7 @@ void compress_file(unsigned char *buffer, tree_node *root, FILE *file){
 	}
 
 	if(bitfile.index != 0){
-		bitfile.buffer <<= bitfile.index;
+		bitfile.buffer <<= 8 - bitfile.index;
 		write_bits_to_file(&bitfile);
 	}
 }
