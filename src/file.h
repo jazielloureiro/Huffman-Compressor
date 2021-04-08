@@ -6,7 +6,7 @@
 
 typedef struct Tree_Node{
 	char *chars;
-	unsigned short frequency;
+	unsigned frequency;
 	struct Tree_Node *left, *right;
 } tree_node;
 
