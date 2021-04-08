@@ -1,14 +1,15 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "list.h"
 #include "file.h"
+#include "list.h"
+#include "tree.h"
 
 FILE *init_file(char *filename, char *mode){
 	FILE *file = fopen(filename, mode);
 
 	if(file == NULL){
-		printf("It wasn't possible to open the file %s", filename);
+		printf("It wasn't possible to open the file %s\n", filename);
 		exit(EXIT_FAILURE);
 	}
 
@@ -25,10 +26,10 @@ long get_file_length(FILE *file){
 	return length;
 }
 
-char *read_whole_file(char *filename, char *mode){
+unsigned char *read_whole_file(char *filename){
 	FILE *file = init_file(filename, "r+");
 	long length = get_file_length(file);
-	char *buffer = malloc(length);
+	unsigned char *buffer = malloc(length);
 
 	fread(buffer, 1, length, file);
 	fclose(file);
@@ -47,7 +48,7 @@ int is_char_in_string(char *str, char ch){
 	return 0;
 }
 
-void writing_in_the_file(Bitfile *bitfile){
+void write_bits_to_file(Bitfile *bitfile){
 	fwrite(&bitfile->buffer, 1, 1, bitfile->file);
 	bitfile->index = 0;
 }
@@ -63,21 +64,21 @@ void find_char_in_tree(char ch, tree_node *aux, Bitfile *bitfile){
 		bitfile->buffer++;
 
 		if(bitfile->index == 8)
-			writing_in_the_file(bitfile);
+			write_bits_to_file(bitfile);
 
 		find_char_in_tree(ch, aux->right, bitfile);
 	}else{
 		if(bitfile->index == 8)
-			writing_in_the_file(bitfile);
+			write_bits_to_file(bitfile);
 
 		find_char_in_tree(ch, aux->left, bitfile);
 	}
 }
 
-void encoding_file(char *buffer, tree_node *root, FILE *out){
+void compress_file(unsigned char *buffer, tree_node *root, FILE *file){
 	Bitfile bitfile;
 
-	bitfile.file = out;
+	bitfile.file = file;
 	bitfile.buffer = 0;
 	bitfile.index = 0;
 
@@ -87,11 +88,13 @@ void encoding_file(char *buffer, tree_node *root, FILE *out){
 		buffer++;
 	}
 
-	bitfile.buffer <<= bitfile.index;
-	writing_in_the_file(&bitfile);
+	if(bitfile.index != 0){
+		bitfile.buffer <<= bitfile.index;
+		write_bits_to_file(&bitfile);
+	}
 }
 
-void decoding(FILE **in, tree_node *aux, Bitfile *bitfile){
+void find_char_by_bits(FILE **file, tree_node *aux, Bitfile *bitfile){
 	if(aux->left == NULL && aux->right == NULL){
 		fputc(aux->chars[0], bitfile->file);
 		return;
@@ -99,7 +102,7 @@ void decoding(FILE **in, tree_node *aux, Bitfile *bitfile){
 
 	if(bitfile->index == 8){
 		bitfile->index = 0;
-		bitfile->buffer = fgetc(*in);
+		bitfile->buffer = fgetc(*file);
 	}
 
 	bitfile->index++;
@@ -107,22 +110,44 @@ void decoding(FILE **in, tree_node *aux, Bitfile *bitfile){
 	if(bitfile->buffer >> 7){
 		bitfile->buffer <<= 1;
 
-		decoding(in, aux->right, bitfile);
+		find_char_by_bits(file, aux->right, bitfile);
 	}else{
 		bitfile->buffer <<= 1;
 
-		decoding(in, aux->left, bitfile);
+		find_char_by_bits(file, aux->left, bitfile);
 	}
 }
 
-void decoding_file(FILE *in, tree_node *root){
-	unsigned i = 0;
+void decompress_file(FILE *file, tree_node *root, char *filename){
 	Bitfile bitfile;
+	unsigned i = 0;
 
-	bitfile.file = init_file("data/output1.txt", "w");
-	bitfile.buffer = fgetc(in);
+	bitfile.file = init_file(filename, "w");
+	bitfile.buffer = fgetc(file);
 	bitfile.index = 0;
 
 	while(i++ < root->frequency)
-		decoding(&in, root, &bitfile);
+		find_char_by_bits(&file, root, &bitfile);
+}
+
+void write_list_to_header(list_node *aux, FILE *file){
+	if(aux != NULL){
+		write_list_to_header(aux->next, file);
+		fputc(aux->tree->chars[0], file);
+		fwrite(&aux->tree->frequency, sizeof(unsigned short), 1, file);
+	}
+}
+
+list_node *read_list_from_header(FILE *file){
+	list_node *list = NULL;
+	char ch;
+
+	while((ch = fgetc(file)) != '\0'){
+		unsigned short freq;
+
+		fread(&freq, sizeof(unsigned short), 1, file);
+		add_new_node_to_list(&list, create_leaf(ch, freq));
+	}
+
+	return list;
 }

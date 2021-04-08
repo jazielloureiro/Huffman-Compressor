@@ -2,10 +2,11 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "file.h"
 #include "list.h"
 #include "tree.h"
 
-tree_node *create_leaf(char character, unsigned frequency){
+tree_node *create_leaf(char character, unsigned short frequency){
 	tree_node *leaf = malloc(sizeof(tree_node));
 
 	leaf->chars = malloc(LEAF_CHARS_LENGTH);
@@ -44,4 +45,12 @@ tree_node *create_huffman_tree(list_node *list){
 	}
 
 	return list->tree;
+}
+
+void free_tree(tree_node *aux){
+	if(aux != NULL){
+		free_tree(aux->left);
+		free_tree(aux->right);
+		free(aux);
+	}
 }
