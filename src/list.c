@@ -1,3 +1,4 @@
+#include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -5,12 +6,12 @@
 #include "list.h"
 #include "tree.h"
 
-void init_freq_array(unsigned *freq){
-	for(unsigned i = 0; i < MAX_ASCII; i++)
+void init_freq_array(uint32_t *freq){
+	for(uint16_t i = 0; i < MAX_ASCII; i++)
 		freq[i] = 0;
 }
 
-void calc_chars_frequency_in_the_buffer(unsigned *freq, unsigned char *buffer){
+void calc_chars_frequency_in_the_buffer(uint32_t *freq, unsigned char *buffer){
 	while(*buffer != '\0')
 		freq[*(buffer++)]++;
 }
@@ -38,8 +39,8 @@ void add_new_node_to_list(list_node **list, tree_node *tree){
 	}
 }
 
-void transfer_chars_to_list(unsigned *freq, list_node **list){
-	for(unsigned i = 0; i < MAX_ASCII; i++){
+void transfer_chars_to_list(uint32_t *freq, list_node **list){
+	for(uint16_t i = 0; i < MAX_ASCII; i++){
 		if(freq[i] > 0){
 			tree_node *leaf = create_leaf(i, freq[i]);
 			add_new_node_to_list(list, leaf);
@@ -48,7 +49,7 @@ void transfer_chars_to_list(unsigned *freq, list_node **list){
 }
 
 list_node *create_char_list(unsigned char *buffer){
-	unsigned freq[MAX_ASCII];
+	uint32_t freq[MAX_ASCII];
 	list_node *list = NULL;
 
 	init_freq_array(freq);

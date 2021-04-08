@@ -1,3 +1,4 @@
+#include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -134,7 +135,7 @@ void write_list_to_header(list_node *aux, FILE *file){
 	if(aux != NULL){
 		write_list_to_header(aux->next, file);
 		fputc(aux->tree->chars[0], file);
-		fwrite(&aux->tree->frequency, sizeof(unsigned), 1, file);
+		fwrite(&aux->tree->frequency, sizeof(uint32_t), 1, file);
 	}
 }
 
@@ -143,9 +144,9 @@ list_node *read_list_from_header(FILE *file){
 	char ch;
 
 	while((ch = fgetc(file)) != '\0'){
-		unsigned freq;
+		uint32_t freq;
 
-		fread(&freq, sizeof(unsigned), 1, file);
+		fread(&freq, sizeof(uint32_t), 1, file);
 		add_new_node_to_list(&list, create_leaf(ch, freq));
 	}
 

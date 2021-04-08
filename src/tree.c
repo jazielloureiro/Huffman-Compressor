@@ -1,3 +1,4 @@
+#include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -6,7 +7,7 @@
 #include "list.h"
 #include "tree.h"
 
-tree_node *create_leaf(char character, unsigned frequency){
+tree_node *create_leaf(char character, uint32_t frequency){
 	tree_node *leaf = malloc(sizeof(tree_node));
 
 	leaf->chars = malloc(LEAF_CHARS_LENGTH);
