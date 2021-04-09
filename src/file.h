@@ -1,11 +1,11 @@
 #ifndef FILE_H
 #define FILE_H
 
-#define MAX_ASCII 128
-#define LEAF_CHARS_LENGTH 2
+#define MAX_BYTES 256
 
 typedef struct Tree_Node{
-	char *chars;
+	uint8_t *bytes;
+	uint16_t diff_bytes_qty;
 	uint32_t frequency;
 	struct Tree_Node *left, *right;
 } tree_node;
@@ -17,19 +17,16 @@ typedef struct List_Node{
 
 typedef struct{
 	FILE *file;
-	unsigned char buffer;
-	unsigned index;
+	uint8_t buffer, index;
 } Bitfile;
 
 FILE *init_file(char *filename, char *mode);
-long get_file_length(FILE *file);
-unsigned char *read_whole_file(char *filename);
-int is_char_in_string(char *str, char ch);
-void write_bits_to_file(Bitfile *bitfile);
-void find_char_in_tree(char ch, tree_node *aux, Bitfile *bitfile);
-void compress_file(unsigned char *buffer, tree_node *root, FILE *file);
-void find_char_by_bits(FILE **file, tree_node *aux, Bitfile *bitfile);
-void decompress_file(FILE *file, tree_node *root, char *filename);
+uint8_t is_byte_in_bytes_array(uint8_t *bytes, uint8_t byte, uint16_t qty);
+void write_buffer_to_file(Bitfile *bitfile);
+void find_byte_in_tree(uint8_t byte, tree_node *aux, Bitfile *bitfile);
+void compress_file(tree_node *root, FILE *input, FILE *output);
+void find_byte_by_bits(FILE **file, tree_node *aux, Bitfile *bitfile);
+void decompress_file(tree_node *root, FILE *input, FILE *output);
 void write_list_to_header(list_node *aux, FILE *file);
 list_node *read_list_from_header(FILE *file);
 

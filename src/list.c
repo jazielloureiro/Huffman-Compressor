@@ -7,13 +7,21 @@
 #include "tree.h"
 
 void init_freq_array(uint32_t *freq){
-	for(uint16_t i = 0; i < MAX_ASCII; i++)
+	for(uint16_t i = 0; i < MAX_BYTES; i++)
 		freq[i] = 0;
 }
 
-void calc_chars_frequency_in_the_buffer(uint32_t *freq, unsigned char *buffer){
-	while(*buffer != '\0')
-		freq[*(buffer++)]++;
+void calc_bytes_frequency_in_the_file(uint32_t *freq, FILE *file){
+	while(1){
+		uint8_t buffer;
+
+		fread(&buffer, sizeof(uint8_t), 1, file);
+
+		if(feof(file))
+			break;
+
+		freq[buffer]++;
+	}
 }
 
 void add_new_node_to_list(list_node **list, tree_node *tree){
@@ -39,24 +47,27 @@ void add_new_node_to_list(list_node **list, tree_node *tree){
 	}
 }
 
-void transfer_chars_to_list(uint32_t *freq, list_node **list){
-	for(uint16_t i = 0; i < MAX_ASCII; i++){
-		if(freq[i] > 0){
-			tree_node *leaf = create_leaf(i, freq[i]);
-			add_new_node_to_list(list, leaf);
-		}
-	}
+void transfer_bytes_to_list(uint32_t *freq, list_node **list){
+	for(uint16_t i = 0; i < MAX_BYTES; i++)
+		if(freq[i] > 0)
+			add_new_node_to_list(list, create_leaf(i, freq[i]));
 }
 
-list_node *create_char_list(unsigned char *buffer){
-	uint32_t freq[MAX_ASCII];
+list_node *create_char_list(FILE *file){
+	uint32_t freq[MAX_BYTES];
 	list_node *list = NULL;
 
 	init_freq_array(freq);
 
-	calc_chars_frequency_in_the_buffer(freq, buffer);
+	calc_bytes_frequency_in_the_file(freq, file);
 
-	transfer_chars_to_list(freq, &list);
+	transfer_bytes_to_list(freq, &list);
+
+	fseek(file, 0, SEEK_SET);
 
 	return list;
+}
+
+uint16_t get_list_length(list_node *aux){
+	return aux == NULL? 0 : 1 + get_list_length(aux->next);
 }

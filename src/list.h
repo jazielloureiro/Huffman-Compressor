@@ -2,9 +2,10 @@
 #define LIST_H
 
 void init_freq_array(uint32_t *freq);
-void calc_chars_frequency_in_the_buffer(uint32_t *freq, unsigned char *buffer);
+void calc_bytes_frequency_in_the_file(uint32_t *freq, FILE *file);
 void add_new_node_to_list(list_node **list, tree_node *leaf);
-void transfer_chars_to_list(uint32_t *freq, list_node **list);
-list_node *create_char_list(unsigned char *buffer);
+void transfer_bytes_to_list(uint32_t *freq, list_node **list);
+list_node *create_char_list(FILE *file);
+uint16_t get_list_length(list_node *aux);
 
 #endif

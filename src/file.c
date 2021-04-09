@@ -17,93 +17,74 @@ FILE *init_file(char *filename, char *mode){
 	return file;
 }
 
-long get_file_length(FILE *file){
-	long length;
-
-	fseek(file, 0, SEEK_END);
-	length = ftell(file);
-	fseek(file, 0, SEEK_SET);
-
-	return length;
-}
-
-unsigned char *read_whole_file(char *filename){
-	FILE *file = init_file(filename, "r+");
-	long length = get_file_length(file);
-	unsigned char *buffer = malloc(length);
-
-	fread(buffer, 1, length, file);
-	fclose(file);
-
-	return buffer;
-}
-
-int is_char_in_string(char *str, char ch){
-	while(*str != '\0'){
-		if(*str == ch)
+uint8_t is_byte_in_bytes_array(uint8_t *bytes, uint8_t byte, uint16_t qty){
+	for(uint16_t i = 0; i < qty; i++)
+		if(bytes[i] == byte)
 			return 1;
-
-		str++;
-	}
 
 	return 0;
 }
 
-void write_bits_to_file(Bitfile *bitfile){
+void write_buffer_to_file(Bitfile *bitfile){
 	fwrite(&bitfile->buffer, 1, 1, bitfile->file);
 	bitfile->index = 0;
 }
 
-void find_char_in_tree(char ch, tree_node *aux, Bitfile *bitfile){
-	if(aux->chars[0] == ch && aux->chars[1] == '\0')
+void find_byte_in_tree(uint8_t byte, tree_node *aux, Bitfile *bitfile){
+	if(aux->diff_bytes_qty == 1)
 		return;
 
 	bitfile->buffer <<= 1;
 	bitfile->index++;
 
-	if(is_char_in_string(aux->right->chars, ch)){
+	if(is_byte_in_bytes_array(aux->right->bytes, byte, aux->right->diff_bytes_qty)){
 		bitfile->buffer++;
 
 		if(bitfile->index == 8)
-			write_bits_to_file(bitfile);
+			write_buffer_to_file(bitfile);
 
-		find_char_in_tree(ch, aux->right, bitfile);
+		find_byte_in_tree(byte, aux->right, bitfile);
 	}else{
 		if(bitfile->index == 8)
-			write_bits_to_file(bitfile);
+			write_buffer_to_file(bitfile);
 
-		find_char_in_tree(ch, aux->left, bitfile);
+		find_byte_in_tree(byte, aux->left, bitfile);
 	}
 }
 
-void compress_file(unsigned char *buffer, tree_node *root, FILE *file){
+void compress_file(tree_node *root, FILE *input, FILE *output){
 	Bitfile bitfile;
 
-	bitfile.file = file;
+	bitfile.file = output;
 	bitfile.buffer = 0;
 	bitfile.index = 0;
 
-	while(*buffer != '\0'){
-		find_char_in_tree(*buffer, root, &bitfile);
+	while(1){
+		uint8_t byte;
 
-		buffer++;
+		fread(&byte, sizeof(uint8_t), 1, input);
+
+		if(feof(input))
+			break;
+
+		find_byte_in_tree(byte, root, &bitfile);
 	}
 
 	if(bitfile.index != 0){
 		bitfile.buffer <<= 8 - bitfile.index;
-		write_bits_to_file(&bitfile);
+		write_buffer_to_file(&bitfile);
 	}
 }
 
-void find_char_by_bits(FILE **file, tree_node *aux, Bitfile *bitfile){
+void find_byte_by_bits(FILE **file, tree_node *aux, Bitfile *bitfile){
 	if(aux->left == NULL && aux->right == NULL){
-		fputc(aux->chars[0], bitfile->file);
+		fwrite(&aux->bytes[0], sizeof(uint8_t), 1, bitfile->file);
 		return;
 	}
 
 	if(bitfile->index == 8){
 		bitfile->index = 0;
-		bitfile->buffer = fgetc(*file);
+		fread(&bitfile->buffer, sizeof(uint8_t), 1, *file);
 	}
 
 	bitfile->index++;
@@ -111,43 +92,46 @@ void find_char_by_bits(FILE **file, tree_node *aux, Bitfile *bitfile){
 	if(bitfile->buffer >> 7){
 		bitfile->buffer <<= 1;
 
-		find_char_by_bits(file, aux->right, bitfile);
+		find_byte_by_bits(file, aux->right, bitfile);
 	}else{
 		bitfile->buffer <<= 1;
 
-		find_char_by_bits(file, aux->left, bitfile);
+		find_byte_by_bits(file, aux->left, bitfile);
 	}
 }
 
-void decompress_file(FILE *file, tree_node *root, char *filename){
+void decompress_file(tree_node *root, FILE *input, FILE *output){
 	Bitfile bitfile;
-	unsigned i = 0;
 
-	bitfile.file = init_file(filename, "w");
-	bitfile.buffer = fgetc(file);
+	bitfile.file = output;
+	fread(&bitfile.buffer, sizeof(uint8_t), 1, input);
 	bitfile.index = 0;
 
-	while(i++ < root->frequency)
-		find_char_by_bits(&file, root, &bitfile);
+	for(uint64_t i = 0; i < root->frequency; i++)
+		find_byte_by_bits(&input, root, &bitfile);
 }
 
 void write_list_to_header(list_node *aux, FILE *file){
 	if(aux != NULL){
 		write_list_to_header(aux->next, file);
-		fputc(aux->tree->chars[0], file);
+		fwrite(&aux->tree->bytes[0], sizeof(uint8_t), 1, file);
 		fwrite(&aux->tree->frequency, sizeof(uint32_t), 1, file);
 	}
 }
 
 list_node *read_list_from_header(FILE *file){
 	list_node *list = NULL;
-	char ch;
+	uint16_t list_length;
 
-	while((ch = fgetc(file)) != '\0'){
+	fread(&list_length, sizeof(uint16_t), 1, file);
+
+	for(uint16_t i = 0; i < list_length; i++){
+		uint8_t byte;
 		uint32_t freq;
 
+		fread(&byte, sizeof(uint8_t), 1, file);
 		fread(&freq, sizeof(uint32_t), 1, file);
-		add_new_node_to_list(&list, create_leaf(ch, freq));
+		add_new_node_to_list(&list, create_leaf(byte, freq));
 	}
 
 	return list;
