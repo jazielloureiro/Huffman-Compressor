@@ -8,11 +8,11 @@
 #include "tree.h"
 
 void help(){
-	puts("Syntax:\n\t./hc [OPTION] [SOURCE FILE] [DESTINY FILE]"
+	puts("Syntax:\n\t./hc [OPTION] [INPUT FILE] [DESTINY FILE]"
 	     "\n\nOptions:\n\t"
-	     "-c, --compress:\n\t\tcompress the source file.\n\t"
-	     "-d, --decompress:\n\t\tdecompress the source file.\n\t"
-	     "-h, --help:\n\t\tdisplay this help and exit.");
+	     "-c, --compress:\n\t\tcompress the input file.\n\t"
+	     "-d, --decompress:\n\t\tdecompress the input file.\n\t"
+	     "-h, --help:\n\t\tshow this help and exit.");
 }
 
 int main(int argc, char **argv){
