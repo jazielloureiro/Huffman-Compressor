@@ -21,6 +21,6 @@ File compressor using Huffman coding.
 ### Options:
 `-c, --compress`: compress the input file.
 
-`-d, --decompress:`: decompress the input file.
+`-d, --decompress`: decompress the input file.
 
 `-h, --help`: show this help and exit.
