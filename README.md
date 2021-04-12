@@ -14,7 +14,7 @@ File compressor using Huffman coding.
 
 `$ make hc`
 
-## Executing
+## Usage
 ### Syntax:
 `./hc [OPTION] [INPUT FILE] [OUTPUT FILE]`
 
