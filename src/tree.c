@@ -46,6 +46,8 @@ tree_node *create_internal_tree_node(tree_node *left, tree_node *right){
 }
 
 tree_node *create_huffman_tree(list_node *list){
+	tree_node *huffman;
+
 	while(list->next != NULL){
 		tree_node *new = create_internal_tree_node(list->tree, list->next->tree);
 		list_node *trash = list;
@@ -57,13 +59,17 @@ tree_node *create_huffman_tree(list_node *list){
 		add_new_node_to_list(&list, new);
 	}
 
-	return list->tree;
+	huffman = list->tree;
+	free(list);
+
+	return huffman;
 }
 
 void free_tree(tree_node *aux){
 	if(aux != NULL){
 		free_tree(aux->left);
 		free_tree(aux->right);
+		free(aux->bytes);
 		free(aux);
 	}
 }

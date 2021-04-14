@@ -36,7 +36,6 @@ int main(int argc, char **argv){
 
 		fclose(input);
 		fclose(output);
-		free(list);
 		free_tree(root);
 	}else if(strcmp(argv[1], "-d") == 0 || strcmp(argv[1], "--decompress") == 0){
 		FILE *input = init_file(argv[2], "r+"),
@@ -48,7 +47,6 @@ int main(int argc, char **argv){
 
 		fclose(input);
 		fclose(output);
-		free(list);
 		free_tree(root);
 	}else
 		puts("You've entered an invalid option.");
