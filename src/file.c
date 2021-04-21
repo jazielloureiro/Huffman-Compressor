@@ -77,7 +77,7 @@ void compress_file(tree_node *root, FILE *input, FILE *output){
 }
 
 void find_byte_by_bits(FILE **file, tree_node *aux, Bitfile *bitfile){
-	if(aux->left == NULL && aux->right == NULL){
+	if(aux->diff_bytes_qty == 1){
 		fwrite(&aux->bytes[0], sizeof(uint8_t), 1, bitfile->file);
 		return;
 	}
