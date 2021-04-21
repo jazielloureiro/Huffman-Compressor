@@ -121,11 +121,11 @@ void write_list_to_header(list_node *aux, FILE *file){
 
 list_node *read_list_from_header(FILE *file){
 	list_node *list = NULL;
-	uint16_t list_length;
+	uint8_t list_length;
 
-	fread(&list_length, sizeof(uint16_t), 1, file);
+	fread(&list_length, sizeof(uint8_t), 1, file);
 
-	for(uint16_t i = 0; i < list_length; i++){
+	for(uint16_t i = 0; i <= list_length; i++){
 		uint8_t byte;
 		uint32_t freq;
 

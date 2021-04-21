@@ -68,6 +68,6 @@ list_node *create_char_list(FILE *file){
 	return list;
 }
 
-uint16_t get_list_length(list_node *aux){
-	return aux == NULL? 0 : 1 + get_list_length(aux->next);
+uint8_t get_list_length(list_node *aux){
+	return aux->next == NULL? 0 : 1 + get_list_length(aux->next);
 }

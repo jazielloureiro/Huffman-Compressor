@@ -19,9 +19,9 @@ void coding(char **argv, uint8_t operation){
 
 	if(operation == COMPRESS){
 		list_node *list = create_char_list(input);
-		uint16_t list_length = get_list_length(list);
+		uint8_t list_length = get_list_length(list);
 
-		fwrite(&list_length, sizeof(uint16_t), 1, output);
+		fwrite(&list_length, sizeof(uint8_t), 1, output);
 		write_list_to_header(list, output);
 
 		root = create_huffman_tree(list);
