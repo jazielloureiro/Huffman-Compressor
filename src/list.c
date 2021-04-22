@@ -2,9 +2,10 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "file.h"
 #include "list.h"
 #include "tree.h"
+
+#define MAX_BYTES 256
 
 void init_freq_array(uint32_t *freq){
 	for(uint16_t i = 0; i < MAX_BYTES; i++)
