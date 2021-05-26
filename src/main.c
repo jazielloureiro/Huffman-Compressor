@@ -41,11 +41,13 @@ void coding(char **argv, uint8_t operation){
 }
 
 void help(){
-	puts("Syntax:\n\t./hc [OPTION] [INPUT FILE] [DESTINY FILE]"
-	     "\n\nOptions:\n\t"
-	     "-c, --compress:\n\t\tcompress the input file.\n\t"
-	     "-d, --decompress:\n\t\tdecompress the input file.\n\t"
-	     "-h, --help:\n\t\tshow this help and exit.");
+	puts("Usage:\n"
+	     "  hc <options> <input file> <output file>\n"
+	     "  hc [-h | --help]\n\n"
+	     "Options:\n"
+	     "  -c, --compress    Compress the input file\n"
+	     "  -d, --decompress  Decompress the input file\n"
+	     "  -h, --help        Print usage message");
 }
 
 int main(int argc, char **argv){
