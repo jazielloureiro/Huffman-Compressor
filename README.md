@@ -1,26 +1,36 @@
 # Huffman Compressor
+
 File compressor using Huffman coding.
 
-## Install
+## Installation
+
 1. Clone this repository:
 
-`$ git clone https://github.com/jazielloureiro/Huffman-Compressor`
+```sh
+git clone https://github.com/jazielloureiro/Huffman-Compressor
+```
 
-2. Go into the respository directory:
+2. Go into the new directory and run the Makefile:
 
-`$ cd Huffman-Compressor`
-
-3. And then, run the Makefile:
-
-`$ make hc`
+```sh
+cd Huffman-Compressor && make hc
+```
 
 ## Usage
-### Syntax:
-`./hc [OPTION] [INPUT FILE] [OUTPUT FILE]`
+
+```
+hc <options> <input file> <output file>
+hc [-h | --help]
+```
 
 ### Options:
+
 `-c, --compress`: compress the input file.
 
 `-d, --decompress`: decompress the input file.
 
-`-h, --help`: show this help and exit.
+`-h, --help`: print usage message.
+
+## License
+
+[MIT](https://github.com/jazielloureiro/Huffman-Compressor/blob/master/LICENSE)
