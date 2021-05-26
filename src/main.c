@@ -51,16 +51,18 @@ void help(){
 }
 
 int main(int argc, char **argv){
-	if(argc > 4)
-		puts("You've entered too many arguments.");
-	else if(argc == 1 || strcmp(argv[1], "-h") == 0 || strcmp(argv[1], "--help") == 0)
+	if(argc == 1)
 		help();
+	else if(argc == 2 && (strcmp(argv[1], "-h") == 0 || strcmp(argv[1], "--help") == 0))
+		help();
+	else if(argc != 4)
+		puts("Error: invalid number of arguments.\nTry 'hc --help'");
 	else if(strcmp(argv[1], "-c") == 0 || strcmp(argv[1], "--compress") == 0)
 		coding(argv, COMPRESS);
 	else if(strcmp(argv[1], "-d") == 0 || strcmp(argv[1], "--decompress") == 0)
 		coding(argv, DECOMPRESS);
 	else
-		puts("You've entered an invalid option.");
+		puts("Error: unrecognized option.\nTry 'hc --help'");
 
 	return 0;
 }
